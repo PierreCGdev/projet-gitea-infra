@@ -1,0 +1,63 @@
+---
+# Mise à jour du système
+- name: Update apt cache and upgrade packages
+  ansible.builtin.apt:
+    update_cache: yes
+    upgrade: safe
+  become: true
+
+# Hardening SSH
+- name: Deploy SSH hardening config
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+  notify: Restart SSH
+
+# UFW — firewall OS (règles de base communes à toutes les machines)
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  become: true
+
+- name: UFW default deny incoming
+  community.general.ufw:
+    default: deny
+    direction: incoming
+  become: true
+
+- name: UFW default allow outgoing
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+  become: true
+
+- name: UFW allow SSH
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+  become: true
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  become: true
+
+# NTP — synchronisation de l'heure entre les nodes
+- name: Install chrony
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+  become: true
+
+- name: Enable and start chrony
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: yes
+  become: true

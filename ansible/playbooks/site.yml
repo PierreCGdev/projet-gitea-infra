@@ -1,0 +1,24 @@
+---
+# 1. Hardening SSH + UFW + NTP sur toutes les machines
+- name: Common
+  hosts: all
+  roles:
+    - common
+
+# 2. Docker + mount EFS sur les nodes Swarm, monitoring et Traefik
+- name: Docker
+  hosts: swarm:monitoring:traefik
+  roles:
+    - docker
+
+# 3. Init Swarm sur manager[0], join sur les autres managers et workers
+- name: Swarm
+  hosts: swarm
+  roles:
+    - swarm
+
+# 4. Prometheus + Grafana sur la machine monitoring
+- name: Monitoring
+  hosts: monitoring
+  roles:
+    - monitoring

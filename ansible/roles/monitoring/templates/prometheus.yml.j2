@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # Node exporter — métriques système sur tous les nodes Swarm
+  - job_name: 'node'
+    static_configs:
+      - targets:
+{% for ip in groups['managers'] %}
+          - '{{ ip }}:9100'
+{% endfor %}
+{% for ip in groups['workers'] %}
+          - '{{ ip }}:9100'
+{% endfor %}

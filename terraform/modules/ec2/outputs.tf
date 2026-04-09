@@ -4,8 +4,8 @@ output "bastion_public_ip" {
 }
 
 output "traefik_public_ip" {
-  description = "Traefik EIP (stable)"
-  value       = aws_eip.traefik.public_ip
+  description = "Traefik public IP (changes on stop/start)"
+  value       = aws_instance.traefik.public_ip
 }
 
 output "manager_private_ips" {

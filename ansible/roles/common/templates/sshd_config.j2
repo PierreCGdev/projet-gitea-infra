@@ -1,0 +1,24 @@
+# Généré par Ansible — ne pas modifier manuellement
+
+Port 22
+Protocol 2
+
+# Authentification
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# Restrictions
+AllowUsers ubuntu
+MaxAuthTries 3
+LoginGraceTime 30
+
+# Désactiver les features inutilisées
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding no
+
+# Keepalive
+ClientAliveInterval 300
+ClientAliveCountMax 2

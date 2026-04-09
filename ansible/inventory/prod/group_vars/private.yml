@@ -1,0 +1,4 @@
+# Les machines privées ne sont pas accessibles directement depuis internet.
+# On transite par le bastion via ProxyJump.
+# groups["bastion"][0] récupère l'IP du bastion depuis l'inventaire automatiquement.
+ansible_ssh_common_args: '-o ProxyJump=ubuntu@{{ groups["bastion"][0] }}'

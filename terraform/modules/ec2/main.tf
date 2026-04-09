@@ -50,15 +50,6 @@ resource "aws_instance" "traefik" {
   }
 }
 
-# EIP sur Traefik (IP fixe pour le DNS)
-resource "aws_eip" "traefik" {
-  instance = aws_instance.traefik.id
-  domain   = "vpc"
-
-  tags = {
-    Name = "${var.project}-${var.env}-eip-traefik"
-  }
-}
 
 # Swarm managers (subnet privé)
 resource "aws_instance" "manager" {
