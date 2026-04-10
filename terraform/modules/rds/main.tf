@@ -59,6 +59,10 @@ resource "aws_db_instance" "main" {
   # Permet le stop/start manuel
   deletion_protection = false
 
+  lifecycle {
+    ignore_changes = [password]
+  }
+
   tags = {
     Name = "${var.project}-${var.env}-db"
   }

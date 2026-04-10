@@ -22,3 +22,15 @@
   hosts: monitoring
   roles:
     - monitoring
+
+# 5. Traefik sur son EC2 (reverse proxy HTTP + TCP SSH Gitea)
+- name: Traefik
+  hosts: traefik
+  roles:
+    - traefik
+
+# 6. Stack Gitea sur le Swarm (lancée depuis manager[0])
+- name: Gitea
+  hosts: managers[0]
+  roles:
+    - gitea

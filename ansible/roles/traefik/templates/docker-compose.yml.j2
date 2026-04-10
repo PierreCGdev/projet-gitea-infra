@@ -1,0 +1,11 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    ports:
+      - "80:80"      # HTTP public
+      - "222:222"    # SSH Gitea public (TCP routing)
+      - "8080:8080"  # Dashboard Traefik (accès via tunnel SSH — à fermer en Phase 6)
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./dynamic:/etc/traefik/dynamic:ro
+    restart: unless-stopped

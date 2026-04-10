@@ -1,0 +1,50 @@
+---
+# Créer les dossiers de travail
+- name: Create Traefik directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: ubuntu
+    mode: '0755'
+  become: true
+  loop:
+    - /opt/traefik
+    - /opt/traefik/dynamic
+
+# Config statique Traefik (entrypoints, provider file)
+- name: Deploy Traefik static config
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: /opt/traefik/traefik.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart Traefik
+
+# Docker Compose pour lancer Traefik
+- name: Deploy Traefik docker-compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/traefik/docker-compose.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart Traefik
+
+# Config dynamique — routes vers Gitea (IPs des nodes Swarm via Jinja2)
+- name: Deploy Traefik dynamic config (Gitea routes)
+  ansible.builtin.template:
+    src: gitea.yml.j2
+    dest: /opt/traefik/dynamic/gitea.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart Traefik
+
+# Démarrer Traefik
+- name: Start Traefik
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: /opt/traefik
+  become: true
+  changed_when: false

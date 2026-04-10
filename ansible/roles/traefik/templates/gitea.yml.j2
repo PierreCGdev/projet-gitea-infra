@@ -1,0 +1,36 @@
+# Config dynamique Traefik — routes vers Gitea
+# Générée par Ansible avec les IPs des nodes Swarm
+
+http:
+  routers:
+    gitea:
+      entryPoints:
+        - web
+      rule: "PathPrefix(`/`)"
+      service: gitea
+
+  services:
+    gitea:
+      loadBalancer:
+        servers:
+          # Swarm routing mesh : n'importe quel node sur port 3000 atteint Gitea
+{% for ip in groups['swarm'] %}
+          - url: "http://{{ ip }}:3000"
+{% endfor %}
+
+tcp:
+  routers:
+    gitea-ssh:
+      entryPoints:
+        - ssh-gitea
+      rule: "HostSNI(`*`)"  # Accepte tout (pas de TLS ici, TCP pur)
+      service: gitea-ssh
+
+  services:
+    gitea-ssh:
+      loadBalancer:
+        servers:
+          # Swarm routing mesh : port 222 redirigé vers le container Gitea port 22
+{% for ip in groups['swarm'] %}
+          - address: "{{ ip }}:222"
+{% endfor %}

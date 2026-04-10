@@ -1,0 +1,19 @@
+# Config statique Traefik — générée par Ansible
+
+api:
+  dashboard: true
+  insecure: true  # Dashboard accessible en HTTP (port 8080) — à sécuriser en Phase 6
+
+entryPoints:
+  web:
+    address: ":80"
+  ssh-gitea:
+    address: ":222"  # Port TCP pour SSH Gitea (utilisateurs git clone)
+
+providers:
+  file:
+    directory: /etc/traefik/dynamic  # Config dynamique dans le dossier /dynamic
+    watch: true                       # Recharge automatiquement si fichier modifié
+
+log:
+  level: INFO

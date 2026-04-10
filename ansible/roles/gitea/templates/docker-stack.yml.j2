@@ -1,0 +1,43 @@
+services:
+  gitea:
+    image: gitea/gitea:1.22
+    environment:
+      # Base de données PostgreSQL (RDS)
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST={{ rds_endpoint }}
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD={{ db_password }}
+      - GITEA__database__SSL_MODE=require
+      # URL publique (Traefik) — mise à jour en Phase 4 avec le vrai domaine
+      - GITEA__server__DOMAIN={{ traefik_public_ip }}
+      - GITEA__server__ROOT_URL=http://{{ traefik_public_ip }}
+      # SSH Gitea pour les utilisateurs (git clone)
+      - GITEA__server__SSH_DOMAIN={{ traefik_public_ip }}
+      - GITEA__server__SSH_PORT=222
+      # LFS (Large File Storage) activé
+      - GITEA__server__LFS_START_SERVER=true
+      - GITEA__lfs__PATH=/data/lfs
+    volumes:
+      # Données Gitea sur EFS (partagé entre tous les nodes Swarm)
+      - /mnt/gitea-data/gitea:/data
+    ports:
+      - target: 3000   # Port HTTP Gitea dans le container
+        published: 3000 # Port sur le routing mesh Swarm
+        mode: ingress
+      - target: 22    # Port SSH Gitea dans le container
+        published: 222  # Port sur le routing mesh Swarm
+        mode: ingress
+    networks:
+      - gitea-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker  # Gitea tourne sur les workers
+      restart_policy:
+        condition: on-failure
+
+networks:
+  gitea-net:
+    driver: overlay

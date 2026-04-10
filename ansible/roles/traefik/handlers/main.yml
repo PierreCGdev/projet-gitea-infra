@@ -1,0 +1,6 @@
+---
+- name: Restart Traefik
+  ansible.builtin.command:
+    cmd: docker compose restart
+    chdir: /opt/traefik
+  become: true

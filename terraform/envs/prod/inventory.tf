@@ -14,10 +14,12 @@ resource "local_file" "ansible_inventory" {
 
 # Génère les variables Terraform utilisées par les rôles Ansible
 resource "local_file" "ansible_terraform_vars" {
-  filename = "${path.module}/../../../ansible/inventory/prod/group_vars/all.yml"
+  filename = "${path.module}/../../../ansible/inventory/prod/group_vars/all/terraform.yml"
 
   content = templatefile("${path.module}/terraform_vars.yml.tpl", {
-    efs_dns_name = module.efs.efs_dns_name
+    efs_dns_name      = module.efs.efs_dns_name
+    rds_endpoint      = module.rds.db_endpoint
+    traefik_public_ip = module.ec2.traefik_public_ip
   })
 }
 

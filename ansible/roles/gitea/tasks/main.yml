@@ -1,0 +1,27 @@
+---
+# Créer le dossier de données Gitea sur EFS
+# owner 1000:1000 = UID/GID de l'utilisateur git dans le container Gitea
+- name: Create Gitea data directory on EFS
+  ansible.builtin.file:
+    path: /mnt/gitea-data/gitea
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+  become: true
+
+# Déployer le stack file (template Jinja2 avec rds_endpoint, db_password, traefik_public_ip)
+- name: Deploy Gitea stack file
+  ansible.builtin.template:
+    src: docker-stack.yml.j2
+    dest: /opt/gitea-stack.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+
+# Déployer la stack sur le Swarm (idempotent : mise à jour si stack existante)
+- name: Deploy Gitea stack on Swarm
+  ansible.builtin.command:
+    cmd: docker stack deploy -c /opt/gitea-stack.yml gitea --with-registry-auth
+  become: true
+  changed_when: true

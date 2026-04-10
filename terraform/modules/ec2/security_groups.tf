@@ -105,6 +105,22 @@ resource "aws_security_group" "swarm" {
   }
 
   ingress {
+    description     = "Gitea HTTP from Traefik"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.traefik.id]
+  }
+
+  ingress {
+    description     = "Gitea SSH from Traefik"
+    from_port       = 222
+    to_port         = 222
+    protocol        = "tcp"
+    security_groups = [aws_security_group.traefik.id]
+  }
+
+  ingress {
     description = "Swarm management"
     from_port   = 2377
     to_port     = 2377
