@@ -1,0 +1,25 @@
+services:
+  node-exporter:
+    image: prom/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - target: 9100
+        published: 9100
+        mode: host  # mode host = port ouvert sur l'IP du node, pas sur le routing mesh
+    networks:
+      - exporters-net
+    deploy:
+      mode: global  # une instance sur chaque node Swarm automatiquement
+      restart_policy:
+        condition: on-failure
+
+networks:
+  exporters-net:
+    driver: overlay

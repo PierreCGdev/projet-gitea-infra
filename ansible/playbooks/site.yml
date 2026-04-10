@@ -34,3 +34,9 @@
   hosts: managers[0]
   roles:
     - gitea
+
+# 7. Exporters Prometheus — UFW sur tous les nodes, stack depuis manager[0]
+- name: Exporters
+  hosts: swarm
+  roles:
+    - exporters

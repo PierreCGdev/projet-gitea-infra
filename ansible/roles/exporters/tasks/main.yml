@@ -1,0 +1,70 @@
+---
+# Ouvrir le port 9100 dans UFW depuis le monitoring uniquement
+- name: UFW allow node-exporter scrape from monitoring
+  community.general.ufw:
+    rule: allow
+    port: '9100'
+    proto: tcp
+    src: "{{ monitoring_ip }}"
+  become: true
+
+# Supprimer la stack Docker exporters si elle existe (conflit de port)
+- name: Remove Docker exporters stack if present
+  ansible.builtin.command: docker stack rm exporters
+  become: true
+  ignore_errors: true
+  changed_when: false
+  when: inventory_hostname == groups['managers'][0]
+
+# Télécharger et installer node_exporter directement sur le host (pas Docker)
+# Évite les problèmes de routage réseau Docker en Swarm
+- name: Download node_exporter
+  ansible.builtin.get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+    dest: /tmp/node_exporter.tar.gz
+    mode: '0644'
+  become: true
+
+- name: Extract node_exporter
+  ansible.builtin.unarchive:
+    src: /tmp/node_exporter.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  become: true
+
+- name: Install node_exporter binary
+  ansible.builtin.copy:
+    src: /tmp/node_exporter-1.8.1.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    owner: root
+    mode: '0755'
+    remote_src: yes
+  become: true
+
+# Créer un service systemd pour node_exporter
+- name: Create node_exporter systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/node_exporter.service
+    content: |
+      [Unit]
+      Description=Prometheus Node Exporter
+      After=network.target
+
+      [Service]
+      User=nobody
+      ExecStart=/usr/local/bin/node_exporter
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root
+    mode: '0644'
+  become: true
+  notify: Restart node_exporter
+
+- name: Enable and start node_exporter
+  ansible.builtin.service:
+    name: node_exporter
+    state: started
+    enabled: yes
+  become: true

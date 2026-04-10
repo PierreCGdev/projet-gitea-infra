@@ -20,6 +20,7 @@ resource "local_file" "ansible_terraform_vars" {
     efs_dns_name      = module.efs.efs_dns_name
     rds_endpoint      = module.rds.db_endpoint
     traefik_public_ip = module.ec2.traefik_public_ip
+    monitoring_ip     = module.ec2.monitoring_private_ip
   })
 }
 

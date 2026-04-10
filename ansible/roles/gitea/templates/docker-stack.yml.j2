@@ -9,6 +9,8 @@ services:
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD={{ db_password }}
       - GITEA__database__SSL_MODE=require
+      # Métriques Prometheus sur /metrics
+      - GITEA__metrics__ENABLED=true
       # URL publique (Traefik) — mise à jour en Phase 4 avec le vrai domaine
       - GITEA__server__DOMAIN={{ traefik_public_ip }}
       - GITEA__server__ROOT_URL=http://{{ traefik_public_ip }}

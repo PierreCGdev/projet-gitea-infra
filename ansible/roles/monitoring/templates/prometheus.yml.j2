@@ -2,7 +2,7 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  # Node exporter — métriques système sur tous les nodes Swarm
+  # Node exporter — métriques système (CPU, RAM, disque) sur chaque node Swarm
   - job_name: 'node'
     static_configs:
       - targets:
@@ -12,3 +12,13 @@ scrape_configs:
 {% for ip in groups['workers'] %}
           - '{{ ip }}:9100'
 {% endfor %}
+
+  # Gitea — métriques applicatives (repos, users, issues...)
+  # Activé via GITEA__metrics__ENABLED=true dans le stack file
+  - job_name: 'gitea'
+    static_configs:
+      - targets:
+{% for ip in groups['workers'] %}
+          - '{{ ip }}:3000'
+{% endfor %}
+    metrics_path: /metrics

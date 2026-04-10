@@ -121,6 +121,22 @@ resource "aws_security_group" "swarm" {
   }
 
   ingress {
+    description = "Node exporter scrape from monitoring (private subnet)"
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.2.0/24"]
+  }
+
+  ingress {
+    description = "Gitea metrics scrape from monitoring (private subnet)"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.2.0/24"]
+  }
+
+  ingress {
     description = "Swarm management"
     from_port   = 2377
     to_port     = 2377
@@ -192,14 +208,6 @@ resource "aws_security_group" "monitoring" {
     to_port         = 9090
     protocol        = "tcp"
     security_groups = [aws_security_group.bastion.id]
-  }
-
-  ingress {
-    description     = "Scrape exporters from swarm nodes"
-    from_port       = 9100
-    to_port         = 9100
-    protocol        = "tcp"
-    security_groups = [aws_security_group.swarm.id]
   }
 
   egress {
