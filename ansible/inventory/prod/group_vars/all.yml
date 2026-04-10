@@ -1,2 +1,4 @@
+# Généré automatiquement par Terraform — ne pas modifier manuellement
 ansible_user: ubuntu
 ansible_ssh_private_key_file: ~/.ssh/gitea-project
+efs_dns_name: "fs-04b2ba892eb233466.efs.eu-west-3.amazonaws.com"

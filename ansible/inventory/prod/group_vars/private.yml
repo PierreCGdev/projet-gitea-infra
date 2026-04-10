@@ -1,4 +1,1 @@
-# Les machines privées ne sont pas accessibles directement depuis internet.
-# On transite par le bastion via ProxyJump.
-# groups["bastion"][0] récupère l'IP du bastion depuis l'inventaire automatiquement.
-ansible_ssh_common_args: '-o ProxyJump=ubuntu@{{ groups["bastion"][0] }}'
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -i ~/.ssh/gitea-project -o StrictHostKeyChecking=no -W %h:%p ubuntu@13.38.71.17"'

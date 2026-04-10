@@ -8,6 +8,11 @@ output "traefik_public_ip" {
   value       = aws_instance.traefik.public_ip
 }
 
+output "traefik_private_ip" {
+  description = "Traefik private IP (used by Ansible via ProxyJump)"
+  value       = aws_instance.traefik.private_ip
+}
+
 output "manager_private_ips" {
   description = "Swarm manager private IPs"
   value       = aws_instance.manager[*].private_ip

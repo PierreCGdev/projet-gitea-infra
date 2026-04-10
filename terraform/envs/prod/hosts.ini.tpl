@@ -2,7 +2,7 @@
 ${bastion_ip}
 
 [traefik]
-${traefik_ip}
+${traefik_private_ip}
 
 [managers]
 %{ for ip in manager_ips ~}
