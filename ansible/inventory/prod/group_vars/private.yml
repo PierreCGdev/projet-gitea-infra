@@ -1,1 +1,1 @@
-ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -i ~/.ssh/gitea-project -o StrictHostKeyChecking=no -W %h:%p ubuntu@13.38.71.17"'
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -i ~/.ssh/gitea-project -o StrictHostKeyChecking=no -W %h:%p ubuntu@35.180.187.118"'

@@ -8,7 +8,9 @@
 
 # Ansible
 *.retry
-ansible/inventory/*.ini
+ansible/inventory/**/*.ini
+ansible/inventory/**/group_vars/private.yml
+ansible/inventory/**/group_vars/all/terraform.yml
 
 # Secrets
 *.pem

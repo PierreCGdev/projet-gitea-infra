@@ -6,14 +6,45 @@
     upgrade: safe
   become: true
 
-# Hardening SSH
-- name: Deploy SSH hardening config
-  ansible.builtin.template:
-    src: sshd_config.j2
-    dest: /etc/ssh/sshd_config
-    owner: root
-    group: root
-    mode: '0600'
+# Hardening SSH — lineinfile pour ne modifier que les lignes nécessaires
+# (préserve Include et AuthorizedKeysFile de l'AMI Ubuntu AWS)
+- name: Harden SSH — disable root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin no'
+  become: true
+  notify: Restart SSH
+
+- name: Harden SSH — disable password auth
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  become: true
+  notify: Restart SSH
+
+- name: Harden SSH — enable TCP forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowTcpForwarding'
+    line: 'AllowTcpForwarding yes'
+  become: true
+  notify: Restart SSH
+
+- name: Harden SSH — max auth tries
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?MaxAuthTries'
+    line: 'MaxAuthTries 3'
+  become: true
+  notify: Restart SSH
+
+- name: Harden SSH — keepalive
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?ClientAliveInterval'
+    line: 'ClientAliveInterval 300'
   become: true
   notify: Restart SSH
 
@@ -22,12 +53,6 @@
   ansible.builtin.apt:
     name: ufw
     state: present
-  become: true
-
-- name: UFW default deny incoming
-  community.general.ufw:
-    default: deny
-    direction: incoming
   become: true
 
 - name: UFW default allow outgoing
@@ -39,14 +64,27 @@
 - name: UFW allow SSH
   community.general.ufw:
     rule: allow
-    port: '22'
+    port: "22"
     proto: tcp
+  become: true
+
+- name: UFW default deny incoming
+  community.general.ufw:
+    default: deny
+    direction: incoming
   become: true
 
 - name: Enable UFW
   community.general.ufw:
     state: enabled
   become: true
+  async: 30
+  poll: 0
+
+- name: Wait for SSH after UFW enable
+  ansible.builtin.wait_for_connection:
+    delay: 5
+    timeout: 60
 
 # NTP — synchronisation de l'heure entre les nodes
 - name: Install chrony
