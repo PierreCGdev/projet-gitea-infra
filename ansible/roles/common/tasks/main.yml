@@ -48,6 +48,17 @@
   become: true
   notify: Restart SSH
 
+# Clé SSH sur le bastion — nécessaire pour que le deploy CI/CD puisse sauter bastion → manager
+- name: Deploy SSH private key to bastion
+  ansible.builtin.copy:
+    src: ~/.ssh/gitea-project
+    dest: /home/ubuntu/.ssh/gitea-project
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+  become: true
+  when: inventory_hostname in groups['bastion']
+
 # UFW — firewall OS (règles de base communes à toutes les machines)
 - name: Install UFW
   ansible.builtin.apt:

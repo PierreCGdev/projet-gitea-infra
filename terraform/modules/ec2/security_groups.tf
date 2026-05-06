@@ -12,6 +12,14 @@ resource "aws_security_group" "bastion" {
     cidr_blocks = [var.admin_ip]
   }
 
+  ingress {
+    description = "SSH from GitHub Actions"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
