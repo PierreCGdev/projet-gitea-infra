@@ -1,7 +1,0 @@
-# Généré automatiquement par Terraform — ne pas modifier manuellement
-ansible_user: ubuntu
-ansible_ssh_private_key_file: ~/.ssh/gitea-project
-efs_dns_name: "fs-074d37e553f133fb2.efs.eu-west-3.amazonaws.com"
-rds_endpoint: "gitea-prod-db.cd0ycauugwkd.eu-west-3.rds.amazonaws.com:5432"
-traefik_public_ip: "35.180.124.222"
-monitoring_ip: "10.0.2.185"
