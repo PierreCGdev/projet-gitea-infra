@@ -11,5 +11,5 @@ instance_type_small   = "t3.micro"  # bastion, Traefik, monitoring
 
 admin_ip = "x.x.x.x/32"  # à remplacer par ton IP — curl ifconfig.me
 
-# db_password = "à définir dans terraform.tfvars (non commité)"
+# db password 
 db_password = "password_to_define" 
