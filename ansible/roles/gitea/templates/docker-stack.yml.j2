@@ -1,6 +1,6 @@
 services:
   gitea:
-    image: gitea/gitea:1.22
+    image: ghcr.io/pierrecgdev/gitea-coderepublic:latest
     environment:
       # Base de données PostgreSQL (RDS)
       - GITEA__database__DB_TYPE=postgres
