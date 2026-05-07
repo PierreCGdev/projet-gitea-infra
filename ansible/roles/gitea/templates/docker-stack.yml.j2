@@ -38,7 +38,7 @@ services:
         constraints:
           - node.role == worker  # Gitea tourne sur les workers
       restart_policy:
-        condition: on-failure
+        condition: any
 
 networks:
   gitea-net:
