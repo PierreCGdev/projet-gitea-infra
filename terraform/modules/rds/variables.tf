@@ -28,6 +28,11 @@ variable "sg_swarm_id" {
   type        = string
 }
 
+variable "sg_bastion_id" {
+  description = "Bastion security group ID (allowed to connect to RDS for debug)"
+  type        = string
+}
+
 variable "db_password" {
   description = "RDS PostgreSQL password"
   type        = string

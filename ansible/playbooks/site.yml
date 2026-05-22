@@ -40,3 +40,9 @@
   hosts: swarm
   roles:
     - exporters
+
+# 8. Backup pg_dump → S3 (cron quotidien depuis manager[0])
+- name: Backup
+  hosts: managers[0]
+  roles:
+    - backup

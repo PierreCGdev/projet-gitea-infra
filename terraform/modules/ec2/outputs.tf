@@ -32,3 +32,8 @@ output "sg_swarm_id" {
   description = "Swarm security group ID (used by RDS and EFS)"
   value       = aws_security_group.swarm.id
 }
+
+output "sg_bastion_id" {
+  description = "Bastion security group ID (used by RDS for debug access)"
+  value       = aws_security_group.bastion.id
+}

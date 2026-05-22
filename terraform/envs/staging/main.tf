@@ -21,6 +21,12 @@ module "vpc" {
   env     = var.env
 }
 
+module "s3" {
+  source  = "../../modules/s3"
+  project = var.project
+  env     = var.env
+}
+
 module "ec2" {
   source  = "../../modules/ec2"
   project = var.project
@@ -36,7 +42,8 @@ module "ec2" {
   instance_type_worker  = var.instance_type_worker
   instance_type_small   = var.instance_type_small
 
-  admin_ip = var.admin_ip
+  admin_ip          = var.admin_ip
+  backup_bucket_arn = module.s3.bucket_arn
 }
 
 module "rds" {
@@ -48,6 +55,7 @@ module "rds" {
   subnet_private_id   = module.vpc.subnet_private_id
   subnet_private_b_id = module.vpc.subnet_private_b_id
   sg_swarm_id         = module.ec2.sg_swarm_id
+  sg_bastion_id       = module.ec2.sg_bastion_id
 
   db_password = var.db_password
 }

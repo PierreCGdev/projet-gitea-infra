@@ -17,10 +17,11 @@ resource "local_file" "ansible_terraform_vars" {
   filename = "${path.module}/../../../ansible/inventory/staging/group_vars/all/terraform.yml"
 
   content = templatefile("${path.module}/terraform_vars.yml.tpl", {
-    efs_dns_name      = module.efs.efs_dns_name
-    rds_endpoint      = module.rds.db_endpoint
-    traefik_public_ip = module.ec2.traefik_public_ip
-    monitoring_ip     = module.ec2.monitoring_private_ip
+    efs_dns_name         = module.efs.efs_dns_name
+    rds_endpoint         = module.rds.db_endpoint
+    traefik_public_ip    = module.ec2.traefik_public_ip
+    monitoring_ip        = module.ec2.monitoring_private_ip
+    backup_bucket_name   = module.s3.bucket_name
   })
 }
 

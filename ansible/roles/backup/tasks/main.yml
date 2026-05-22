@@ -1,0 +1,38 @@
+---
+- name: Install postgresql-client, curl and unzip
+  become: true
+  apt:
+    name:
+      - postgresql-client
+      - curl
+      - unzip
+    state: present
+    update_cache: yes
+
+- name: Install AWS CLI v2
+  become: true
+  shell: |
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+    unzip -o /tmp/awscliv2.zip -d /tmp/awscli
+    /tmp/awscli/aws/install --update
+    rm -rf /tmp/awscli /tmp/awscliv2.zip
+  args:
+    creates: /usr/local/bin/aws
+
+- name: Deploy backup script
+  become: true
+  template:
+    src: gitea-backup.sh.j2
+    dest: /usr/local/bin/gitea-backup.sh
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Setup daily cron backup at 2am
+  become: true
+  cron:
+    name: gitea-db-backup
+    minute: "0"
+    hour: "2"
+    job: /usr/local/bin/gitea-backup.sh >> /var/log/gitea-backup.log 2>&1
+    user: root

@@ -53,12 +53,13 @@ resource "aws_instance" "traefik" {
 
 # Swarm managers (subnet privé)
 resource "aws_instance" "manager" {
-  count                  = var.manager_count
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type_manager
-  subnet_id              = var.subnet_private_id
-  key_name               = aws_key_pair.main.key_name
+  count                = var.manager_count
+  ami                  = data.aws_ami.ubuntu.id
+  instance_type        = var.instance_type_manager
+  subnet_id            = var.subnet_private_id
+  key_name             = aws_key_pair.main.key_name
   vpc_security_group_ids = [aws_security_group.swarm.id]
+  iam_instance_profile = aws_iam_instance_profile.backup.name
 
   tags = {
     Name = "${var.project}-${var.env}-manager-${count.index + 1}"
@@ -67,12 +68,13 @@ resource "aws_instance" "manager" {
 
 # Swarm workers (subnet privé)
 resource "aws_instance" "worker" {
-  count                  = var.worker_count
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type_worker
-  subnet_id              = var.subnet_private_id
-  key_name               = aws_key_pair.main.key_name
+  count                = var.worker_count
+  ami                  = data.aws_ami.ubuntu.id
+  instance_type        = var.instance_type_worker
+  subnet_id            = var.subnet_private_id
+  key_name             = aws_key_pair.main.key_name
   vpc_security_group_ids = [aws_security_group.swarm.id]
+  iam_instance_profile = aws_iam_instance_profile.backup.name
 
   tags = {
     Name = "${var.project}-${var.env}-worker-${count.index + 1}"
