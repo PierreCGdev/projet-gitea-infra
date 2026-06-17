@@ -8,6 +8,48 @@
     mode: '0755'
   become: true
 
+# Créer les dossiers provisioning Grafana
+- name: Create Grafana provisioning directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: ubuntu
+    mode: '0755'
+  become: true
+  loop:
+    - /opt/monitoring/grafana/provisioning/datasources
+    - /opt/monitoring/grafana/provisioning/dashboards
+
+# Datasource Prometheus préconfigurée
+- name: Deploy Grafana datasource config
+  ansible.builtin.copy:
+    src: grafana/datasources/prometheus.yml
+    dest: /opt/monitoring/grafana/provisioning/datasources/prometheus.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart monitoring stack
+
+# Config du provider de dashboards (indique à Grafana où chercher les JSON)
+- name: Deploy Grafana dashboards provider config
+  ansible.builtin.copy:
+    src: grafana/dashboards/dashboards.yml
+    dest: /opt/monitoring/grafana/provisioning/dashboards/dashboards.yml
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart monitoring stack
+
+# Télécharge le dashboard Node Exporter Full depuis grafana.com
+- name: Download Node Exporter Full dashboard (ID 1860)
+  ansible.builtin.get_url:
+    url: https://grafana.com/api/dashboards/1860/revisions/latest/download
+    dest: /opt/monitoring/grafana/provisioning/dashboards/node-exporter.json
+    owner: ubuntu
+    mode: '0644'
+  become: true
+  notify: Restart monitoring stack
+
 # Déployer la config Prometheus (template avec IPs des nodes)
 - name: Deploy Prometheus config
   ansible.builtin.template:
