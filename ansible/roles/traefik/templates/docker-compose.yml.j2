@@ -2,10 +2,14 @@ services:
   traefik:
     image: traefik:v3.0
     ports:
-      - "80:80"      # HTTP public
+      - "80:80"      # HTTP public (redirigé vers HTTPS)
+      - "443:443"    # HTTPS public
       - "222:222"    # SSH Gitea public (TCP routing)
-      - "8080:8080"  # Dashboard Traefik (accès via tunnel SSH — à fermer en Phase 6)
+      - "8080:8080"  # Dashboard Traefik (accès via tunnel SSH)
+    environment:
+      - DUCKDNS_TOKEN={{ duckdns_token }}
     volumes:
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./dynamic:/etc/traefik/dynamic:ro
+      - ./acme:/etc/traefik/acme
     restart: unless-stopped

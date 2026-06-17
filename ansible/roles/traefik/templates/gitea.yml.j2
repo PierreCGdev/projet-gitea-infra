@@ -5,9 +5,11 @@ http:
   routers:
     gitea:
       entryPoints:
-        - web
-      rule: "PathPrefix(`/`)"
+        - websecure
+      rule: "Host(`{{ traefik_domain }}`)"
       service: gitea
+      tls:
+        certResolver: duckdns
 
   services:
     gitea:

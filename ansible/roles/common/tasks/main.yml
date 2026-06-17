@@ -95,7 +95,7 @@
 - name: Wait for SSH after UFW enable
   ansible.builtin.wait_for_connection:
     delay: 5
-    timeout: 60
+    timeout: 120
 
 # NTP — synchronisation de l'heure entre les nodes
 - name: Install chrony

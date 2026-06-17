@@ -10,6 +10,16 @@
   loop:
     - /opt/traefik
     - /opt/traefik/dynamic
+    - /opt/traefik/acme
+
+# acme.json doit exister avec permissions 600 avant le démarrage de Traefik
+- name: Create acme.json for Let's Encrypt certificates
+  ansible.builtin.file:
+    path: /opt/traefik/acme/acme.json
+    state: touch
+    owner: ubuntu
+    mode: '0600'
+  become: true
 
 # Config statique Traefik (entrypoints, provider file)
 - name: Deploy Traefik static config
@@ -48,3 +58,29 @@
     chdir: /opt/traefik
   become: true
   changed_when: false
+
+# Mise à jour DuckDNS avec l'IP publique de la machine Traefik
+# IMDSv2 : il faut d'abord récupérer un token avant d'accéder aux métadonnées EC2
+- name: Get IMDSv2 token
+  ansible.builtin.uri:
+    url: http://169.254.169.254/latest/api/token
+    method: PUT
+    headers:
+      X-aws-ec2-metadata-token-ttl-seconds: "21600"
+    return_content: yes
+  register: imds_token
+
+- name: Get Traefik public IP from AWS metadata
+  ansible.builtin.uri:
+    url: http://169.254.169.254/latest/meta-data/public-ipv4
+    headers:
+      X-aws-ec2-metadata-token: "{{ imds_token.content }}"
+    return_content: yes
+  register: traefik_public_ip
+
+- name: Update DuckDNS with Traefik public IP
+  ansible.builtin.uri:
+    url: "https://www.duckdns.org/update?domains={{ traefik_domain.split('.duckdns.org')[0] }}&token={{ duckdns_token }}&ip={{ traefik_public_ip.content }}"
+    return_content: yes
+  register: duckdns_response
+  failed_when: duckdns_response.content != "OK"
